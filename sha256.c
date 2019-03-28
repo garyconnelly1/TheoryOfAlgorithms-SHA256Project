@@ -1,9 +1,9 @@
 // Gary Connelly
-
 #include <stdio.h>
 #include <stdint.h>
 
 // From - esr.ibiblio.org/?p=5095
+#define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8 ) | ((x) << 24))
 #define IS_BIG_ENDIAN (*(uint16_t *)"\0\xff" < 0x100) 
 union msgblock{
   uint8_t e[64];
@@ -151,16 +151,26 @@ void sha256(FILE *file){
   // Check if it is already Big Endian.
   if(IS_BIG_ENDIAN){
     printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", H[0],H[1],H[2],H[3],H[4],H[5],H[6],H[7]);
-  }else{
-    printf("%08x %08x %08x %08x %08x %08x %08x %08x\n",
-      LitToBigEndian(H[0]),
-      LitToBigEndian(H[1]),
-      LitToBigEndian(H[2]),
-      LitToBigEndian(H[3]),
-      LitToBigEndian(H[4]),
-      LitToBigEndian(H[5]),
-      LitToBigEndian(H[6]),
-      LitToBigEndian(H[7]));
+   }else{
+    printf("Big Endian: %08x %08x %08x %08x %08x %08x %08x %08x\n",
+
+      SWAP_UINT32(H[0]),
+      SWAP_UINT32(H[1]),
+      SWAP_UINT32(H[2]),
+      SWAP_UINT32(H[3]),
+      SWAP_UINT32(H[4]),
+      SWAP_UINT32(H[5]),
+      SWAP_UINT32(H[6]),
+      SWAP_UINT32(H[7])
+    );
+  //    LitToBigEndian(H[0]),
+    //  LitToBigEndian(H[1]),
+   //   LitToBigEndian(H[2]),
+    //  LitToBigEndian(H[3]),
+     // LitToBigEndian(H[4]),
+     // LitToBigEndian(H[5]),
+    //  LitToBigEndian(H[6]),
+    //  LitToBigEndian(H[7]));
    }// End if else (IS_BIG_ENDIAN).
   
 
