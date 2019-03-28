@@ -149,19 +149,19 @@ void sha256(FILE *file){
 
  }// End while.
   // Check if it is already Big Endian.
-//  if(IS_BIG_ENDIAN){
+  if(IS_BIG_ENDIAN){
     printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", H[0],H[1],H[2],H[3],H[4],H[5],H[6],H[7]);
- // }else{
-  //  printf("%08x%08x%08x%08x%08x%08x%08x%08x\n",
-   //   LitToBigEndian(H[0]),
-    //  LitToBigEndian(H[1]),
-     // LitToBigEndian(H[2]),
-    //  LitToBigEndian(H[3]),
-    //  LitToBigEndian(H[4]),
-    //  LitToBigEndian(H[5]),
-    //  LitToBigEndian(H[6]),
-    //  LitToBigEndian(H[7]));
-  // }// End if else (IS_BIG_ENDIAN).
+  }else{
+    printf("%08x %08x %08x %08x %08x %08x %08x %08x\n",
+      LitToBigEndian(H[0]),
+      LitToBigEndian(H[1]),
+      LitToBigEndian(H[2]),
+      LitToBigEndian(H[3]),
+      LitToBigEndian(H[4]),
+      LitToBigEndian(H[5]),
+      LitToBigEndian(H[6]),
+      LitToBigEndian(H[7]));
+   }// End if else (IS_BIG_ENDIAN).
   
 
 }// End sha. (Look up Big Endian and Little Endian.)
@@ -200,7 +200,7 @@ uint32_t Maj(uint32_t x, uint32_t y, uint32_t z){
   return ((x & y) ^ (x & z) ^ (y & z));
 }
 
-// Method definition for LitBigEndian.
+// Method definition for LitToBigEndian.
 unsigned int LitToBigEndian(unsigned int x){
   return (((x >> 24) & 0x000000ff) | ((x >> 8) & 0x0000ff00) | ((x << 8) & 0x00ff0000) | ((x << 24) & 0xff000000));
 }
