@@ -1,8 +1,24 @@
 // Gary Connelly
+
 #include <stdio.h>
 #include <stdint.h>
 
-void sha256();
+// From - esr.ibiblio.org/?p=5095
+#define IS_BIG_ENDIAN (*(uint16_t *)"\0\xff" < 0x100) 
+union msgblock{
+  uint8_t e[64];
+  uint32_t t[16];
+  uint64_t s[8];
+
+};
+
+
+enum status {READ, PAD0, PAD1, FINISH};
+
+void sha256(FILE *file);
+
+int nextMsgBlock(FILE *file, union msgblock *M, enum status *S, uint64_t *noBits);
+
 
 // See Section 4.1.2 for definition. 
 uint32_t sig0(uint32_t x);
@@ -18,10 +34,16 @@ uint32_t Maj(uint32_t x, uint32_t y, uint32_t z);
 uint32_t rotr(uint32_t n, uint32_t x);
 uint32_t shr(uint32_t n, uint32_t x);
 
+// Method to convert from Little Endian to Big Endian.
+unsigned int LitToBigEndian(unsigned int x);
 
 int main (int argc, char *argv[]){
 
-  sha256();
+FILE *file;
+
+file = fopen(argv[1], "r");
+
+  sha256(file);
 
 
   
@@ -29,9 +51,15 @@ int main (int argc, char *argv[]){
 
 }
 
-void sha256(){
+void sha256(FILE *file){
 
+  union msgblock M;
 
+  uint64_t nobits = 0;
+
+  enum status S = READ;
+
+  // The K constants, defined in section 4.4.4.
   uint32_t K[] = {
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
     0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -52,15 +80,16 @@ void sha256(){
 
 
 };
- 
+  
+  // Message shedule (Section 6.2). 
   uint32_t W[64];
-
+  // Working variables (Section 6.2).
   uint32_t a,b,c,d,e,f,g,h;
-
-
-
+  // Two temporary variables (Section 6.2).
   uint32_t T1, T2;
 
+
+  // The hash values (Section 6.2).
   uint32_t H[8] = {
     0x6a09e667,
     0xbb67ae85,
@@ -72,16 +101,16 @@ void sha256(){
     0x5be0cd19
   };
   
-  uint32_t M[16]  = {0,0,0,0,0,0,0,0};
+ // uint32_t M[16]  = {0,0,0,0,0,0,0,0};
 
   // For looping.
   int t,i;  
   
-  for( i = 0; i < 1; i ++){
+  while(nextMsgBlock(file, &M, &S, &nobits)){
   
   // From page 22, W[t] = M[t] for 0 <= t <= 15.
   for(t = 0; t < 16; t++)
-    W[t] = M[t];
+    W[t] = M.t[t];
 
   for(t = 16; t < 64; t++)
     W[t] = sig1(W[t-2]) + W[t-7] + sig0(W[t-15]) + W[t-16];
@@ -105,7 +134,7 @@ void sha256(){
     b = a;
     a = T1 + T2;
 
-  }// End for.
+  }// End while.
 
   // Step 4.
   H[0] = a + H[0];
@@ -116,9 +145,10 @@ void sha256(){
   H[5] = f + H[5];
   H[6] = g + H[6];
   H[7] = h + H[7];
-
+    
+  printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", H[0],H[1],H[2],H[3],H[4],H[5],H[6],H[7]);
   }
-}
+}// End sha. (Look up Big Endian and Little Endian.)
 
 uint32_t sig0(uint32_t x){
   // See Sections 3.2 and 4.1.2 for definitions.
@@ -156,6 +186,78 @@ uint32_t Maj(uint32_t x, uint32_t y, uint32_t z){
 
 
 
+// Message Block function here.
+int nextMsgBlock(FILE *file, union msgblock * M, enum status *S, uint64_t *nobits){
+
+  // The number of bytes we get from fread.
+  uint64_t nobytes;
+
+  //For looping.
+  int i;
+
+  // If we have finished all of the message blocks, then S should be FINISH.
+  if(*S == FINISH)
+    return 0;
+
+  // Otherwise, check if we need another block full of padding.
+  if(*S == PAD0 || *S == PAD1){
+    // Set the first 56 bytes to all zero bits.
+    for(i = 0; i < 56; i++)
+      M->e[0] = 0x00;
+    // Set the last 64 bits to the number of bits in the file( should be big-endian).
+    M->s[7] = *nobits;
+    // Tell S we are finished.
+    *S = FINISH;
+    // If S was PAD1, then set the first bit of M to one.
+    if(*S == PAD1)
+      M->e[0] = 0x80;
+    // Keep the loop in sha256 going for one more iteration.
+  }// End if.
+
+  // If we get down here, we havn't finished readong the file (S == READ).
+  nobytes = fread(M->e, 1, 64, file);
+
+  // Keep track of the number of bytes we've read.
+  *nobits = *nobits + (nobytes * 8);
+  
+  // If we read less than 56 bits, we can put all padding in this message block.
+  if(nobytes < 56){
+    // Add the one bit, as per the standard.
+    M->e[nobytes] = 0x80;
+
+    // Add the zero bits until the last 64 bits.
+    while(nobytes < 56){
+      nobytes = nobytes + 1;
+      M->e[nobytes] = 0x00;
+    }//End while nobytes < 56
+    // Append the file size in bits as an unsigned 64 bit int. (Should be Big Endian).
+    M->e[7] = *nobits;
+    // Tell S we are finished.
+    *S = FINISH;
+    // Otherwise, check if we can put some padding into this message block.
+  }//End if nobytes < 56
+  else if (nobytes < 64){
+    // Tell S we need another message block, with padding but no one bit.
+    *S = PAD0;
+    // Put the one bit into the current block.
+    M->e[nobytes] = 0x80;
+    // Pad the rest of this block wth zero bits.
+    while(nobytes < 64){
+      nobytes = nobytes + 1;
+      M->e[nobytes] = 0x00;
+    }// End while nobytes < 64
+   
+  }// End else if nobytes < 64
+  // Otherwise, check if we are just at the end of the file.
+  else if(feof(file)){
+    // Tell S that we need another message block with all the padding.
+    *S = PAD1;
+  }// End else if feof(file)
+  
+  // If we get this far, then return 1 so that the function is called again.
+  return 1;
+  
+}// End nextMsgBlock
 
 
 
