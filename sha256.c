@@ -63,9 +63,15 @@ int main (int argc, char *argv[]){
 
   FILE *file;
 
-  file = fopen(argv[1], "r");
+  //file = fopen(argv[1], "r");
+   if((file = fopen(argv[1], "r"))!=NULL){
+     sha256(file);
+   }
+   else{
+     printf("Error occurred while opening file, please try again!");
+   }
 
-  sha256(file);
+  
   
   fclose(file);
   
