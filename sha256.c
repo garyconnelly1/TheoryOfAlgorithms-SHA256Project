@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+
+
 // From - esr.ibiblio.org/?p=5095
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8 ) | ((x) << 24))
 #define IS_BIG_ENDIAN (*(uint16_t *)"\0\xff" < 0x100) 
@@ -63,9 +65,11 @@ int main (int argc, char *argv[]){
 
   FILE *file;
 
+    
+
   //file = fopen(argv[1], "r");
    if((file = fopen(argv[1], "r"))!=NULL){
-     sha256(file);
+     sha256(file);  
    }
    else{
      printf("Error occurred while opening file, please try again!");
@@ -117,8 +121,15 @@ void sha256(FILE *file){
   while(nextMsgBlock(file, &M, &S, &nobits)){
   
   // From page 22, W[t] = M[t] for 0 <= t <= 15.
-  for(t = 0; t < 16; t++)
-    W[t] = M.t[t];
+  for(t = 0; t < 16; t++){
+   // if(IS_BIG_ENDIAN){
+       W[t] = M.t[t];
+   // }else{
+     // W[t] = SWAP_UINT32(M.t[t]) ;
+   // }
+   
+  }
+    
 
   for(t = 16; t < 64; t++)
     W[t] = sig1(W[t-2]) + W[t-7] + sig0(W[t-15]) + W[t-16];
@@ -240,15 +251,16 @@ int nextMsgBlock(FILE *file, union msgblock * M, enum status *S, uint64_t *nobit
   if(*S == PAD0 || *S == PAD1){
     // Set the first 56 bytes to all zero bits.
     for(i = 0; i < 56; i++)
-      M->e[0] = 0x00;
+      M->e[i] = 0x00;
     // Set the last 64 bits to the number of bits in the file( should be big-endian).
-    M->s[7] = *nobits;
+    M->s[7] = *nobits; 
     // Tell S we are finished.
     *S = FINISH;
     // If S was PAD1, then set the first bit of M to one.
     if(*S == PAD1)
       M->e[0] = 0x80;
     // Keep the loop in sha256 going for one more iteration.
+    return 1;
   }// End if.
 
   // If we get down here, we havn't finished readong the file (S == READ).
