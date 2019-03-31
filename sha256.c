@@ -18,6 +18,7 @@ union msgblock{
 
 };
 
+uint32_t Output[8];
 
 enum status {READ, PAD0, PAD1, FINISH};
 
@@ -204,6 +205,9 @@ void sha256(FILE *file){
   // Check if it is already Big Endian.
   if(IS_BIG_ENDIAN){
     printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", H[0],H[1],H[2],H[3],H[4],H[5],H[6],H[7]);
+    for(t = 0; t < 8; t++){
+        Output[t] =H[t];
+    }
    }else{
     printf("Big Endian: %08x %08x %08x %08x %08x %08x %08x %08x\n",
 
@@ -216,16 +220,18 @@ void sha256(FILE *file){
       SWAP_UINT32(H[6]),
       SWAP_UINT32(H[7])
     );
-  //    LitToBigEndian(H[0]),
-    //  LitToBigEndian(H[1]),
-   //   LitToBigEndian(H[2]),
-    //  LitToBigEndian(H[3]),
-     // LitToBigEndian(H[4]),
-     // LitToBigEndian(H[5]),
-    //  LitToBigEndian(H[6]),
-    //  LitToBigEndian(H[7]));
-   }// End if else (IS_BIG_ENDIAN).
+
+    for(t = 0; t < 8; t++){
+        Output[t] =SWAP_UINT32(H[t]);
+    }
   
+   }// End if else (IS_BIG_ENDIAN).
+
+  /*
+   for(t = 0; t < 8; t++){
+        Output[t] =H[t];
+    }
+  */
 
 }// End sha. (Look up Big Endian and Little Endian.)
 
@@ -374,6 +380,7 @@ void enterString(){
 
  if((filePointer = fopen("input.txt", "r"))!=NULL){
      sha256(filePointer);  
+     
    }
    else{
      printf("Error occurred while opening file, please try again!");
@@ -441,6 +448,27 @@ void signUp(){
     // Try to hash that file.
     if((filePointer = fopen(userName, "r"))!=NULL){
      sha256(filePointer);  
+     printf("OUTPUT ---> \n");
+     // Check if it is already Big Endian.
+     printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", Output[0],Output[1],Output[2],Output[3],Output[4],Output[5],Output[6],Output[7]);
+     /*
+  if(IS_BIG_ENDIAN){
+    printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", Output[0],Output[1],Output[2],Output[3],Output[4],Output[5],Output[6],Output[7]);
+   }else{
+    printf("Big Endian: %08x %08x %08x %08x %08x %08x %08x %08x\n",
+
+      SWAP_UINT32(Output[0]),
+      SWAP_UINT32(Output[1]),
+      SWAP_UINT32(Output[2]),
+      SWAP_UINT32(Output[3]),
+      SWAP_UINT32(Output[4]),
+      SWAP_UINT32(Output[5]),
+      SWAP_UINT32(Output[6]),
+      SWAP_UINT32(Output[7])
+    );
+  
+   }// End if else (IS_BIG_ENDIAN).
+   */
    }
    else{
      printf("Error occurred while opening file, please try again!");
