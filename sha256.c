@@ -10,6 +10,7 @@
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8 ) | ((x) << 24))
 #define IS_BIG_ENDIAN (*(uint16_t *)"\0\xff" < 0x100) 
 #define DATA_SIZE 1000
+#define ERROR_MESSAGE "Invalid input, please try again! \n"
 union msgblock{
   uint8_t e[64];
   uint32_t t[16];
@@ -21,6 +22,11 @@ union msgblock{
 enum status {READ, PAD0, PAD1, FINISH};
 
 void sha256(FILE *file);
+
+void loginSystem();
+void login();
+void signUp();
+int cfileexists(const char * filename);
 
 void enterString();
 
@@ -99,6 +105,11 @@ int main (int argc, char *argv[]){
 } // End if menuOption ==1. 
 else if(strcmp(menuOption, "2") == 0){
     enterString();
+}
+else if(strcmp(menuOption, "3") == 0){
+  loginSystem();
+}else{
+  printf(ERROR_MESSAGE);
 }
 
   
@@ -380,12 +391,56 @@ void enterString(){
 }
 
 
+void loginSystem(){
+   char menuOption[DATA_SIZE];
+
+  printf("Press 1 to sign up. Press 2 to log in:\n");
+  gets(menuOption);
+
+  if(strcmp(menuOption, "1") == 0){
+    signUp();
+  }else if(strcmp(menuOption, "2") == 0){
+    login();
+  }
+  else{
+    printf(ERROR_MESSAGE);
+  }
+} // End loginSystem().
+
+void signUp(){
+  printf("================== Sign up ================== \n");
+
+  char data[DATA_SIZE];
+  char userName[DATA_SIZE];
+  char fileName[DATA_SIZE];
+  FILE *filePointer;
+
+  printf("Enter a username: ");
+  gets(userName);
+
+  strcat(userName, ".txt");
+  if(cfileexists(userName)){
+    printf("Username already exists, please try another one!");
+    exit(EXIT_FAILURE);
+  }else{
+    filePointer = fopen(userName, "w");
+
+    if(filePointer == NULL){
+      printf("Unable to create file. \n");
+      exit(EXIT_FAILURE);
+    }
+
+    printf("Enter your password: ");
+    gets(data);
+
+    fputs(data, filePointer);
+
+    fclose(filePointer);
 
 
-/*
-  //file = fopen(argv[1], "r");
-   if((file = fopen(argv[1], "r"))!=NULL){
-     sha256(file);  
+    // Try to hash that file.
+    if((filePointer = fopen(userName, "r"))!=NULL){
+     sha256(filePointer);  
    }
    else{
      printf("Error occurred while opening file, please try again!");
@@ -393,8 +448,33 @@ void enterString(){
 
   
   
-  fclose(file);
-  */
+   fclose(filePointer);
+  }// End else.
+
+   printf("Password created and stored! \n");
+
+}
+
+void login(){
+  printf("================== Login ================== \n");
+}
+
+/*
+ * Check if a file exist using fopen() function
+ * return 1 if the file exist otherwise return 0
+ */
+int cfileexists(const char * filename){
+//  printf("Youre userName: ---> %s\n", filename);   
+
+ /* try to open file to read */
+    FILE *file;
+    if (file = fopen(filename, "r")){
+        fclose(file);
+        return 1;
+    }
+    return 0;
+}
+
 
 
 
