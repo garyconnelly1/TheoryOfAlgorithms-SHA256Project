@@ -1,1 +1,2 @@
-# ReadMe document for TheoryOfAlgorithms-SHA256Project
+# TheoryOfAlgorithms-SHA256Project
+## Download and Run:
