@@ -7,6 +7,7 @@
 // From - esr.ibiblio.org/?p=5095
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8 ) | ((x) << 24))
 #define IS_BIG_ENDIAN (*(uint16_t *)"\0\xff" < 0x100) 
+#define DATA_SIZE 1000
 union msgblock{
   uint8_t e[64];
   uint32_t t[16];
@@ -64,6 +65,15 @@ unsigned int LitToBigEndian(unsigned int x);
 int main (int argc, char *argv[]){
 
   FILE *file;
+
+  char menuOption[DATA_SIZE];
+
+  printf("Press 1 to hash a file:\n");
+  printf("Press 2 to enter a string to hash:\n");
+  printf("Press 3 to use a SHA256 login/registration system:\n");
+  gets(menuOption);
+
+  printf("You selected ---> %s\n", menuOption);
 
     
 
