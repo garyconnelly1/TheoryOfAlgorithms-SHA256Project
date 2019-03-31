@@ -355,7 +355,7 @@ int nextMsgBlock(FILE *file, union msgblock * M, enum status *S, uint64_t *nobit
 
 
 
-void enterString(){
+void enterString(){ // Alow the user to enter their own string to be hashed.
 
   char input[DATA_SIZE];
   FILE *filePointer;
@@ -364,7 +364,7 @@ void enterString(){
   printf("Enter the string you wish to hash:\n");
   gets(input);
 
-  filePointer = fopen("input.txt", "w");
+  filePointer = fopen("input.txt", "w"); // Create the file.
 
   if(filePointer == NULL){
     printf("Error writing the input to a file. Please try again.");
@@ -381,7 +381,7 @@ void enterString(){
 
 
  if((filePointer = fopen("input.txt", "r"))!=NULL){
-     sha256(filePointer);  
+     sha256(filePointer);  // Hash the file and display the answer to the user.
      
    }
    else{
@@ -392,15 +392,13 @@ void enterString(){
   
   fclose(filePointer);
 
-
-
-  //printf("Success!\n");
-
-  //printf("You entered ---> %s\n ", input);
 }
 
 
 void loginSystem(){
+  /*
+    tHIS IS TO DISPLAY A POSSIBLE APPLICATION OF THE SHA256 ALGORITHM.
+  */
    char menuOption[DATA_SIZE];
 
   printf("Press 1 to sign up. Press 2 to log in:\n");
@@ -409,7 +407,7 @@ void loginSystem(){
   if(strcmp(menuOption, "1") == 0){
     signUp();
   }else if(strcmp(menuOption, "2") == 0){
-    login();
+   // login();
   }
   else{
     printf(ERROR_MESSAGE);
@@ -423,6 +421,9 @@ void signUp(){
   char hex[64];
   char newHex[64];
 
+/*
+Created 8 different temp variables to solve pointer issues.
+*/
   char temp[8];
   char temp1[8];
   char temp2[8];
@@ -433,7 +434,7 @@ void signUp(){
   char temp7[8];
   printf("================== Sign up ================== \n");
 
-  char data[DATA_SIZE];
+  char data[DATA_SIZE]; // To get data from the users.
   char userName[DATA_SIZE];
   char fileName[DATA_SIZE];
   FILE *filePointer;
@@ -446,7 +447,7 @@ void signUp(){
   printf("Enter a username: ");
   gets(userName);
 
-  strcat(userName, ".txt");
+  strcat(userName, ".txt"); // Append the username to .txt to create a file for that user.
   if(cfileexists(userName)){
     printf("Username already exists, please try another one!");
     exit(EXIT_FAILURE);
@@ -458,7 +459,7 @@ void signUp(){
       exit(EXIT_FAILURE);
     }
 
-    printf("Enter your password: ");
+    printf("Enter your password: "); // Get the user to enter a password.
     gets(data);
 
     fputs(data, filePointer);
@@ -473,27 +474,13 @@ void signUp(){
      // Check if it is already Big Endian.
      printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", Output[0],Output[1],Output[2],Output[3],Output[4],Output[5],Output[6],Output[7]);
      strcpy(hashFileName, "hash");
-     strcat(hashFileName, userName);
+     strcat(hashFileName, userName); // Create a nother file with the hash of the users password.
      //outFile = fopen(hashFileName, "w");
 
-/*
-      int b = 0;
-     for(int t = 0; t < 8; t++){
-      
-       printf("OUTPUT ---> %08x\n",Output[t]);
-      // sprintf(temp, "%x\n", Output[t]);
-      sprintf(temp, "%x\n", Output[t]);
-       printf("temp %s", temp);
-       a[b] = temp;
-   
-       printf("HEX %s\n", a[t]);
-       //fputs(hex, outFile);
-        b++;
-     }
-     //a[5] = "xs";
-     */
 
-
+      /*
+      Had to copy elements to the array like this because elements were getting overwridden by the last element.
+      */
      sprintf(temp, "%08x", Output[0]);
      a[0] = temp;
      printf("HEX %s\n", a[0]);
@@ -531,16 +518,13 @@ void signUp(){
 
 
 
-
+/*
+Also had to write elements to the file like this because elements were getting iverwritten.
+*/
 
     printf("Here: %s\n", a[0]);
      outFile = fopen(hashFileName, "a");
-     /*
-    for(int i = 0; i < 8; i++){
-        fputs(a[i], outFile);
-        printf("A: %s\n", a[i]);
-    }
-    */
+     
      fputs(a[0], outFile);
 
      fputs(a[1], outFile);
@@ -561,15 +545,7 @@ void signUp(){
 
     
      fclose(outFile);
-     //printf("Output file: ---> %s\n", hashFileName);
-
-     outFile = fopen(hashFileName, "r");
-
-     while(fgets(buffer, sizeof(buffer), outFile)){
-       strcat(data, buffer);
-     }
-     fclose(outFile);
-     printf("Hopefully ---> %d\n", data);
+    
   
    }
    else{
@@ -581,56 +557,184 @@ void signUp(){
    fclose(filePointer);
   }// End else.
 
-   printf("Password created and stored! \n");
+   printf("Password created and stored! \n"); 
 
 }
 
+/*
+Didn/t get this method finished so I left it out of menu options.
+*/
 void login(){
   printf("================== Login ================== \n");
 
   char data[DATA_SIZE];
-  char data1[DATA_SIZE];
-  char data2[DATA_SIZE];
+  char name[DATA_SIZE];
   char userName[DATA_SIZE];
-  char fileName[DATA_SIZE];
-  FILE *filePointer;
-  FILE *outFile;
-  char hashFileName[DATA_SIZE];
-  char x[DATA_SIZE];
-  uint32_t in[8];
-  char buffer[DATA_SIZE];
+  char password[DATA_SIZE];
+  char *a[8];
 
-  outFile = fopen("hashgary.txt", "r+");
+  char temp[8];
+  char temp1[8];
+  char temp2[8];
+  char temp3[8];
+  char temp4[8];
+  char temp5[8];
+  char temp6[8];
+  char temp7[8];
 
-  while(fgets(buffer, sizeof(buffer), outFile)){
-       strcat(data, buffer);
-     }
+
+  strcpy(name, "hash");
+  
+
+ char *result;
+ char *result2;
+ char hex[64];
+ FILE *outFile;
+char hashFileName[DATA_SIZE];
+ // char x[DATA_SIZE];
+ // uint32_t in[8];
+  char buffer[64];
+  int n = 64;
+
+  printf("Enter your username: ");
+  gets(userName);
+  strcat(userName, ".txt");
+
+strcat(name,userName);
+printf("name ---> %s\n", name);
+strcat(hashFileName, "compare");
+  
+
+  if(cfileexists(name)){
+
+    printf("Enter the password:\n");
+    gets(data);
+    strcat(password, name);
+
+    strcat(password, "check.txt");
+
+
+
+    outFile = fopen(password, "w");
+
+    if(outFile == NULL){
+      printf("Error writing the input to a file. Please try again.");
+      exit(EXIT_FAILURE);
+    }// End if filePointer == NULL.
+
+  fputs(data, outFile);
+
+ 
+
+  fclose(outFile);
+
+ // sha256(filePointer);
+
+
+ if((outFile = fopen(password, "r"))!=NULL){
+     sha256(outFile);  
+     
+   }
+   else{
+     printf("Error occurred while opening file, please try again!");
+   }
+
+  
+  
+  fclose(outFile);
+    
+  }else{
+    printf("User doesnt exist, please sign up to continue.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  strcat(hashFileName, password); // To give the resulting hashed file a dfferent name.
+  
+
+ /*
+   if((result = fgets(hex,64,outFile)) != NULL){
+     printf("The string is %s\n", result);
+   }
      fclose(outFile);
 
-     outFile = fopen("hashraf.txt", "r+");
+  outFile = fopen("hashkev.txt", "r");
 
-  while(fgets(buffer, sizeof(buffer), outFile)){
-       strcat(data1, buffer);
-     }
+   if((result2 = fgets(hex,64,outFile)) != NULL){
+     printf("The string is %s\n", result2);
+   }
      fclose(outFile);
 
-outFile = fopen("hashkev.txt", "r+");
 
-  while(fgets(buffer, sizeof(buffer), outFile)){
-       strcat(data2, buffer);
-     }
+  if(strcmp(result,result2) == 0){
+    printf("Working\n");
+  }
+  */
+
+
+   // Get a handle on the hashed value
+    sprintf(temp, "%08x", Output[0]);
+     a[0] = temp;
+     printf("HEX %s\n", a[0]);
+
+     sprintf(temp1, "%08x", Output[1]);
+     a[1] = temp1;
+     printf("HEX %s\n", a[1]);
+
+      sprintf(temp2, "%08x", Output[2]);
+     a[2] = temp2;
+     printf("HEX %s\n", a[2]);
+
+      sprintf(temp3, "%08x", Output[3]);
+     a[3] = temp3;
+     printf("HEX %s\n", a[3]);
+
+      sprintf(temp4, "%08x", Output[4]);
+     a[4] = temp4;
+     printf("HEX %s\n", a[4]);
+
+      sprintf(temp5, "%08x", Output[5]);
+     a[5] = temp5;
+     printf("HEX %s\n", a[5]);
+
+      sprintf(temp6, "%08x", Output[6]);
+     a[6] = temp6;
+     printf("HEX %s\n", a[6]);
+
+      sprintf(temp7, "%08x", Output[7]);
+     a[7] = temp7;
+     printf("HEX %s\n", a[7]);
+
+
+     // Write out thr resulting hash to a file:
+
+      outFile = fopen(hashFileName, "a");
+     
+     fputs(a[0], outFile);
+
+     fputs(a[1], outFile);
+
+     fputs(a[2], outFile);
+
+     fputs(a[3], outFile);
+
+     fputs(a[4], outFile);
+
+     fputs(a[5], outFile);
+
+     fputs(a[6], outFile);
+
+     fputs(a[7], outFile);
+
+
+
+    
      fclose(outFile);
+    
 
-     printf("Gary %s\n", data);
-     printf("Raf %s\n", data2);
 
-     if(strcmp(data,data1)==0){
-     //  printf("Gary and rafs passwords match");
-     }
 
-     if(strcmp(data,data2)!=0){
-      // printf("Gary and kevs passwords dont match");
-     }
+
+   
 
 }
 
