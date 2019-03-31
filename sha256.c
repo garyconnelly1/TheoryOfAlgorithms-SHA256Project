@@ -75,6 +75,8 @@ unsigned int LitToBigEndian(unsigned int x);
 
 int main (int argc, char *argv[]){
 
+ // login();
+
   FILE *file;
 
   char menuOption[DATA_SIZE];
@@ -415,12 +417,31 @@ void loginSystem(){
 } // End loginSystem().
 
 void signUp(){
+
+ char *a[8];
+
+  char hex[64];
+  char newHex[64];
+
+  char temp[8];
+  char temp1[8];
+  char temp2[8];
+  char temp3[8];
+  char temp4[8];
+  char temp5[8];
+  char temp6[8];
+  char temp7[8];
   printf("================== Sign up ================== \n");
 
   char data[DATA_SIZE];
   char userName[DATA_SIZE];
   char fileName[DATA_SIZE];
   FILE *filePointer;
+  FILE *outFile;
+  char hashFileName[DATA_SIZE];
+  char x[DATA_SIZE];
+  uint32_t in[8];
+  char buffer[DATA_SIZE];
 
   printf("Enter a username: ");
   gets(userName);
@@ -451,24 +472,105 @@ void signUp(){
      printf("OUTPUT ---> \n");
      // Check if it is already Big Endian.
      printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", Output[0],Output[1],Output[2],Output[3],Output[4],Output[5],Output[6],Output[7]);
-     /*
-  if(IS_BIG_ENDIAN){
-    printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", Output[0],Output[1],Output[2],Output[3],Output[4],Output[5],Output[6],Output[7]);
-   }else{
-    printf("Big Endian: %08x %08x %08x %08x %08x %08x %08x %08x\n",
+     strcpy(hashFileName, "hash");
+     strcat(hashFileName, userName);
+     //outFile = fopen(hashFileName, "w");
 
-      SWAP_UINT32(Output[0]),
-      SWAP_UINT32(Output[1]),
-      SWAP_UINT32(Output[2]),
-      SWAP_UINT32(Output[3]),
-      SWAP_UINT32(Output[4]),
-      SWAP_UINT32(Output[5]),
-      SWAP_UINT32(Output[6]),
-      SWAP_UINT32(Output[7])
-    );
+/*
+      int b = 0;
+     for(int t = 0; t < 8; t++){
+      
+       printf("OUTPUT ---> %08x\n",Output[t]);
+      // sprintf(temp, "%x\n", Output[t]);
+      sprintf(temp, "%x\n", Output[t]);
+       printf("temp %s", temp);
+       a[b] = temp;
+   
+       printf("HEX %s\n", a[t]);
+       //fputs(hex, outFile);
+        b++;
+     }
+     //a[5] = "xs";
+     */
+
+
+     sprintf(temp, "%08x", Output[0]);
+     a[0] = temp;
+     printf("HEX %s\n", a[0]);
+
+     sprintf(temp1, "%08x", Output[1]);
+     a[1] = temp1;
+     printf("HEX %s\n", a[1]);
+
+      sprintf(temp2, "%08x", Output[2]);
+     a[2] = temp2;
+     printf("HEX %s\n", a[2]);
+
+      sprintf(temp3, "%08x", Output[3]);
+     a[3] = temp3;
+     printf("HEX %s\n", a[3]);
+
+      sprintf(temp4, "%08x", Output[4]);
+     a[4] = temp4;
+     printf("HEX %s\n", a[4]);
+
+      sprintf(temp5, "%08x", Output[5]);
+     a[5] = temp5;
+     printf("HEX %s\n", a[5]);
+
+      sprintf(temp6, "%08x", Output[6]);
+     a[6] = temp6;
+     printf("HEX %s\n", a[6]);
+
+      sprintf(temp7, "%08x", Output[7]);
+     a[7] = temp7;
+     printf("HEX %s\n", a[7]);
+
+
+
+
+
+
+
+
+    printf("Here: %s\n", a[0]);
+     outFile = fopen(hashFileName, "a");
+     /*
+    for(int i = 0; i < 8; i++){
+        fputs(a[i], outFile);
+        printf("A: %s\n", a[i]);
+    }
+    */
+     fputs(a[0], outFile);
+
+     fputs(a[1], outFile);
+
+     fputs(a[2], outFile);
+
+     fputs(a[3], outFile);
+
+     fputs(a[4], outFile);
+
+     fputs(a[5], outFile);
+
+     fputs(a[6], outFile);
+
+     fputs(a[7], outFile);
+
+
+
+    
+     fclose(outFile);
+     //printf("Output file: ---> %s\n", hashFileName);
+
+     outFile = fopen(hashFileName, "r");
+
+     while(fgets(buffer, sizeof(buffer), outFile)){
+       strcat(data, buffer);
+     }
+     fclose(outFile);
+     printf("Hopefully ---> %d\n", data);
   
-   }// End if else (IS_BIG_ENDIAN).
-   */
    }
    else{
      printf("Error occurred while opening file, please try again!");
@@ -485,6 +587,51 @@ void signUp(){
 
 void login(){
   printf("================== Login ================== \n");
+
+  char data[DATA_SIZE];
+  char data1[DATA_SIZE];
+  char data2[DATA_SIZE];
+  char userName[DATA_SIZE];
+  char fileName[DATA_SIZE];
+  FILE *filePointer;
+  FILE *outFile;
+  char hashFileName[DATA_SIZE];
+  char x[DATA_SIZE];
+  uint32_t in[8];
+  char buffer[DATA_SIZE];
+
+  outFile = fopen("hashgary.txt", "r+");
+
+  while(fgets(buffer, sizeof(buffer), outFile)){
+       strcat(data, buffer);
+     }
+     fclose(outFile);
+
+     outFile = fopen("hashraf.txt", "r+");
+
+  while(fgets(buffer, sizeof(buffer), outFile)){
+       strcat(data1, buffer);
+     }
+     fclose(outFile);
+
+outFile = fopen("hashkev.txt", "r+");
+
+  while(fgets(buffer, sizeof(buffer), outFile)){
+       strcat(data2, buffer);
+     }
+     fclose(outFile);
+
+     printf("Gary %s\n", data);
+     printf("Raf %s\n", data2);
+
+     if(strcmp(data,data1)==0){
+     //  printf("Gary and rafs passwords match");
+     }
+
+     if(strcmp(data,data2)!=0){
+      // printf("Gary and kevs passwords dont match");
+     }
+
 }
 
 /*
