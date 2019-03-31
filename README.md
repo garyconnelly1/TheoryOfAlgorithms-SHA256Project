@@ -35,5 +35,8 @@ The basic idea of adding this feature, was to showcase that even if a melicious 
 ## Bugs:
 While all of the hashed values are consistent(get the same hash value for the same input), they are not consistent with online versions of the sha256 algorithm. This obviously means there is a mistake somewhere in the algorithm that I couldn't find at the time of submission.
 
+## Research:
+Along with reading the standards for SHA and watching the video series, I also followed a course on tutorials point to get me up to cratch with C programming. https://www.tutorialspoint.com/cprogramming/ .
+
 ## Author:
 Gary Connelly - G00336837.
