@@ -1,6 +1,8 @@
 // Gary Connelly
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 
@@ -19,6 +21,8 @@ union msgblock{
 enum status {READ, PAD0, PAD1, FINISH};
 
 void sha256(FILE *file);
+
+void enterString();
 
 int nextMsgBlock(FILE *file, union msgblock *M, enum status *S, uint64_t *noBits);
 
@@ -73,12 +77,14 @@ int main (int argc, char *argv[]){
   printf("Press 3 to use a SHA256 login/registration system:\n");
   gets(menuOption);
 
-  printf("You selected ---> %s\n", menuOption);
+  //printf("You selected ---> %s\n", menuOption);
 
-    
+  if(strcmp(menuOption, "1") == 0){
+    printf("Enter the name of the file you wish to hash(include the extension eg. .txt)");
+    gets(menuOption);
 
-  //file = fopen(argv[1], "r");
-   if((file = fopen(argv[1], "r"))!=NULL){
+     //file = fopen(argv[1], "r");
+   if((file = fopen(menuOption, "r"))!=NULL){
      sha256(file);  
    }
    else{
@@ -88,6 +94,13 @@ int main (int argc, char *argv[]){
   
   
   fclose(file);
+
+    
+} // End if menuOption ==1. 
+else if(strcmp(menuOption, "2") == 0){
+    enterString();
+}
+
   
   return 0;
 
@@ -317,6 +330,71 @@ int nextMsgBlock(FILE *file, union msgblock * M, enum status *S, uint64_t *nobit
   return 1;
   
 }// End nextMsgBlock
+
+
+
+
+
+
+void enterString(){
+
+  char input[DATA_SIZE];
+  FILE *filePointer;
+  FILE *file;
+
+  printf("Enter the string you wish to hash:\n");
+  gets(input);
+
+  filePointer = fopen("input.txt", "w");
+
+  if(filePointer == NULL){
+    printf("Error writing the input to a file. Please try again.");
+    exit(EXIT_FAILURE);
+  }// End if filePointer == NULL.
+
+  fputs(input, filePointer);
+
+ 
+
+  fclose(filePointer);
+
+ // sha256(filePointer);
+
+
+ if((filePointer = fopen("input.txt", "r"))!=NULL){
+     sha256(filePointer);  
+   }
+   else{
+     printf("Error occurred while opening file, please try again!");
+   }
+
+  
+  
+  fclose(filePointer);
+
+
+
+  //printf("Success!\n");
+
+  //printf("You entered ---> %s\n ", input);
+}
+
+
+
+
+/*
+  //file = fopen(argv[1], "r");
+   if((file = fopen(argv[1], "r"))!=NULL){
+     sha256(file);  
+   }
+   else{
+     printf("Error occurred while opening file, please try again!");
+   }
+
+  
+  
+  fclose(file);
+  */
 
 
 
