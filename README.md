@@ -1,6 +1,6 @@
 # TheoryOfAlgorithms-SHA256Project
 ## Download and Run:
-
+* All you need to run this program is the GCC compiler - https://sourceforge.net/projects/tdm-gcc/ .
 * Download this project by either downloading the .zip, or by typing "git clone https://github.com/garyconnelly1/TheoryOfAlgorithms-SHA256Project.git" into a command line.
 
 * To run the program, simply type sha256 and press enter.
