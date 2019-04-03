@@ -1,4 +1,4 @@
-// Gary Connelly
+// Gary Connelly - G00336837
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -18,18 +18,18 @@ union msgblock{
 
 };
 
-uint32_t Output[8];
+uint32_t Output[8]; // Declare array to allow for global access to the current hash.
 
 enum status {READ, PAD0, PAD1, FINISH};
 
 void sha256(FILE *file);
-
+// =========================================== Added features.
 void loginSystem();
 void login();
 void signUp();
 int cfileexists(const char * filename);
-
 void enterString();
+// ========================================= End Added features.
 
 int nextMsgBlock(FILE *file, union msgblock *M, enum status *S, uint64_t *noBits);
 
@@ -79,24 +79,27 @@ int main (int argc, char *argv[]){
 
   FILE *file;
 
-  char menuOption[DATA_SIZE];
+  char menuOption[DATA_SIZE]; // Store the current menu choice.
 
+  /*
+  Start Menu.
+  */
   printf("Press 1 to hash a file:\n");
   printf("Press 2 to enter a string to hash:\n");
   printf("Press 3 to use a SHA256 login/registration system:\n");
   gets(menuOption);
 
-  //printf("You selected ---> %s\n", menuOption);
+ 
 
-  if(strcmp(menuOption, "1") == 0){
+  if(strcmp(menuOption, "1") == 0){ // If they chose one, get them to enter the name of the file to hash.
     printf("Enter the name of the file you wish to hash(include the extension eg. .txt)");
     gets(menuOption);
 
-     //file = fopen(argv[1], "r");
+     // Open the file and send it to the hash algorithm.
    if((file = fopen(menuOption, "r"))!=NULL){
      sha256(file);  
    }
-   else{
+   else{ // If, for any reason this file cannot be opened.
      printf("Error occurred while opening file, please try again!");
    }
 
@@ -107,11 +110,11 @@ int main (int argc, char *argv[]){
     
 } // End if menuOption ==1. 
 else if(strcmp(menuOption, "2") == 0){
-    enterString();
+    enterString(); // Send them to the enterString() method to handle the user input.
 }
 else if(strcmp(menuOption, "3") == 0){
-  loginSystem();
-}else{
+  loginSystem(); // Send them to the loginSystem() method.
+}else{// If they enter an option that is not 1, 2 or 3.
   printf(ERROR_MESSAGE);
 }
 
@@ -224,16 +227,12 @@ void sha256(FILE *file){
     );
 
     for(t = 0; t < 8; t++){
-        Output[t] =SWAP_UINT32(H[t]);
+        Output[t] =SWAP_UINT32(H[t]); // Populate the global Output[] array to have global access to the hash values.
     }
   
    }// End if else (IS_BIG_ENDIAN).
 
-  /*
-   for(t = 0; t < 8; t++){
-        Output[t] =H[t];
-    }
-  */
+ 
 
 }// End sha. (Look up Big Endian and Little Endian.)
 
@@ -357,30 +356,30 @@ int nextMsgBlock(FILE *file, union msgblock * M, enum status *S, uint64_t *nobit
 
 void enterString(){ // Alow the user to enter their own string to be hashed.
 
-  char input[DATA_SIZE];
-  FILE *filePointer;
-  FILE *file;
+  char input[DATA_SIZE]; // To store the users input.
+  FILE *filePointer; // Declare a pointer to the file we want the users input to be written to.
+  
 
   printf("Enter the string you wish to hash:\n");
   gets(input);
 
   filePointer = fopen("input.txt", "w"); // Create the file.
 
-  if(filePointer == NULL){
+  if(filePointer == NULL){ // If an error occurred creating the file.
     printf("Error writing the input to a file. Please try again.");
     exit(EXIT_FAILURE);
   }// End if filePointer == NULL.
 
-  fputs(input, filePointer);
+  fputs(input, filePointer); // Write the users input to the file.
 
  
 
-  fclose(filePointer);
-
- // sha256(filePointer);
+  fclose(filePointer); // Close the file.
 
 
- if((filePointer = fopen("input.txt", "r"))!=NULL){
+
+
+ if((filePointer = fopen("input.txt", "r"))!=NULL){ // Open the same file, this time with read permissions.
      sha256(filePointer);  // Hash the file and display the answer to the user.
      
    }
@@ -390,14 +389,16 @@ void enterString(){ // Alow the user to enter their own string to be hashed.
 
   
   
-  fclose(filePointer);
+  fclose(filePointer); // Close the file.
 
 }
 
 
-void loginSystem(){
+void loginSystem(){ 
   /*
-    tHIS IS TO DISPLAY A POSSIBLE APPLICATION OF THE SHA256 ALGORITHM.
+    This is to display a possible application of the SHA256 algorithm.
+
+    The only purpose of this particular function, is to send the user to the right part of the program.
   */
    char menuOption[DATA_SIZE];
 
@@ -405,9 +406,9 @@ void loginSystem(){
   gets(menuOption);
 
   if(strcmp(menuOption, "1") == 0){
-    signUp();
+    signUp(); // Send the user to the signup() method.
   }else if(strcmp(menuOption, "2") == 0){
-   // login();
+   // login(); Login method was incomplete, so it is commented out to prevent crashing the program.
   }
   else{
     printf(ERROR_MESSAGE);
@@ -416,10 +417,11 @@ void loginSystem(){
 
 void signUp(){
 
- char *a[8];
+  /*
+  A method to simulate creating a user account, using the sha256 algorithm to hash the users password.
+  */
 
-  char hex[64];
-  char newHex[64];
+ char *a[8]; // Declare array that stores the string values of the uint32_t[] in Output.
 
 /*
 Created 8 different temp variables to solve pointer issues.
@@ -440,19 +442,17 @@ Created 8 different temp variables to solve pointer issues.
   FILE *filePointer;
   FILE *outFile;
   char hashFileName[DATA_SIZE];
-  char x[DATA_SIZE];
-  uint32_t in[8];
-  char buffer[DATA_SIZE];
+  //char buffer[DATA_SIZE];
 
-  printf("Enter a username: ");
+  printf("Enter a username: "); // Get the users username.
   gets(userName);
 
   strcat(userName, ".txt"); // Append the username to .txt to create a file for that user.
-  if(cfileexists(userName)){
+  if(cfileexists(userName)){ // Check if that username already exists by seeing if a file by the same name exists.
     printf("Username already exists, please try another one!");
     exit(EXIT_FAILURE);
   }else{
-    filePointer = fopen(userName, "w");
+    filePointer = fopen(userName, "w"); // Point to the file with write permissions.
 
     if(filePointer == NULL){
       printf("Unable to create file. \n");
@@ -462,26 +462,26 @@ Created 8 different temp variables to solve pointer issues.
     printf("Enter your password: "); // Get the user to enter a password.
     gets(data);
 
-    fputs(data, filePointer);
+    fputs(data, filePointer); // Writeh the plain text password to the file.
 
-    fclose(filePointer);
+    fclose(filePointer); // Close the file.
 
 
     // Try to hash that file.
     if((filePointer = fopen(userName, "r"))!=NULL){
-     sha256(filePointer);  
+     sha256(filePointer); // Create the hash value of the password.
      printf("OUTPUT ---> \n");
      // Check if it is already Big Endian.
      printf("%08x %08x %08x %08x %08x %08x %08x %08x\n", Output[0],Output[1],Output[2],Output[3],Output[4],Output[5],Output[6],Output[7]);
-     strcpy(hashFileName, "hash");
-     strcat(hashFileName, userName); // Create a nother file with the hash of the users password.
-     //outFile = fopen(hashFileName, "w");
+     strcpy(hashFileName, "hash"); // Prefix the word "hash" to the start of the files name.
+     strcat(hashFileName, userName); // Create a nother file with the hash of the users password, called hash*userName*.txt.
+    
 
 
       /*
       Had to copy elements to the array like this because elements were getting overwridden by the last element.
       */
-     sprintf(temp, "%08x", Output[0]);
+     sprintf(temp, "%08x", Output[0]); // Convert the uint32_t into a hexadecimal string. https://stackoverflow.com/questions/3464194/how-can-i-convert-an-integer-to-a-hexadecimal-string-in-c
      a[0] = temp;
      printf("HEX %s\n", a[0]);
 
@@ -522,8 +522,8 @@ Created 8 different temp variables to solve pointer issues.
 Also had to write elements to the file like this because elements were getting iverwritten.
 */
 
-    printf("Here: %s\n", a[0]);
-     outFile = fopen(hashFileName, "a");
+    printf("Here: %s\n", a[0]); // Print out the first element of a to make sure is wasn't overridden by the last element.
+     outFile = fopen(hashFileName, "a"); // Write the hashed password to the newly created file.
      
      fputs(a[0], outFile);
 
@@ -544,7 +544,7 @@ Also had to write elements to the file like this because elements were getting i
 
 
     
-     fclose(outFile);
+     fclose(outFile); // Close the file.
     
   
    }
@@ -554,7 +554,7 @@ Also had to write elements to the file like this because elements were getting i
 
   
   
-   fclose(filePointer);
+   fclose(filePointer); // Close the file.
   }// End else.
 
    printf("Password created and stored! \n"); 
@@ -563,6 +563,12 @@ Also had to write elements to the file like this because elements were getting i
 
 /*
 Didn/t get this method finished so I left it out of menu options.
+
+This file was added near enough to the deadline, so it is incomplete and there is no doubt a lot of bugs in it. 
+The idea for this method, was to have the user enter a username and password. Search the file system for the file with their username preceeded by the word "hash",
+if such a file exists, read it in and save its contents. Hash the password the user just entered to login by saving it to the Output global variable. Convert that
+output variable to a string representation of the hexidecimal number. Finally compare that string, with the string read in from the users file. If they match, then 
+the user is validated and just see a "Welcome to app" message. If not, then the password is incorrect.
 */
 void login(){
   printf("================== Login ================== \n");
@@ -573,6 +579,9 @@ void login(){
   char password[DATA_SIZE];
   char *a[8];
 
+  /*
+  Also created the temp array like this to get around the pointer issue.
+  */
   char temp[8];
   char temp1[8];
   char temp2[8];
@@ -583,24 +592,19 @@ void login(){
   char temp7[8];
 
 
-  strcpy(name, "hash");
+  strcpy(name, "hash"); // The file we need to find has to begin with the word hash.
   
 
  char *result;
  char *result2;
- char hex[64];
  FILE *outFile;
-char hashFileName[DATA_SIZE];
- // char x[DATA_SIZE];
- // uint32_t in[8];
-  char buffer[64];
-  int n = 64;
+ char hashFileName[DATA_SIZE];
 
   printf("Enter your username: ");
   gets(userName);
-  strcat(userName, ".txt");
+  strcat(userName, ".txt"); // Append ".txt" to the username so it can be searched in the file directory.
 
-strcat(name,userName);
+strcat(name,userName); // Append this username to "hash".
 printf("name ---> %s\n", name);
 strcat(hashFileName, "compare");
   
@@ -643,7 +647,7 @@ strcat(hashFileName, "compare");
   
   fclose(outFile);
     
-  }else{
+  }else{ // If the file doesnt exist, that means the username they entered doesn't exist.
     printf("User doesnt exist, please sign up to continue.\n");
     exit(EXIT_FAILURE);
   }
@@ -651,24 +655,7 @@ strcat(hashFileName, "compare");
   strcat(hashFileName, password); // To give the resulting hashed file a dfferent name.
   
 
- /*
-   if((result = fgets(hex,64,outFile)) != NULL){
-     printf("The string is %s\n", result);
-   }
-     fclose(outFile);
-
-  outFile = fopen("hashkev.txt", "r");
-
-   if((result2 = fgets(hex,64,outFile)) != NULL){
-     printf("The string is %s\n", result2);
-   }
-     fclose(outFile);
-
-
-  if(strcmp(result,result2) == 0){
-    printf("Working\n");
-  }
-  */
+ 
 
 
    // Get a handle on the hashed value
